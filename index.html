@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Prank 👾</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#050510;color:white;
+  font-family:Arial,sans-serif;text-align:center;
+  min-height:100vh;overflow-x:hidden
+}
+.screen{max-width:500px;margin:auto;padding:28px 18px}
+.hidden{display:none!important}
+h1{line-height:1.25}
+button{
+  border:0;border-radius:12px;padding:14px 22px;
+  background:#00f5ff;color:#050510;font-weight:bold;
+  font-size:16px;cursor:pointer;margin:8px
+}
+.red{color:#ff315b;text-shadow:0 0 18px #ff174c}
+.neon{color:#00f5ff;text-shadow:0 0 15px #00f5ff}
+#warning{padding-top:17vh}
+.warningbox{
+  border:1px solid #ff315b;border-radius:18px;
+  padding:25px 14px;background:#1a0711;
+  box-shadow:0 0 35px #ff174c33
+}
+.blink{animation:blink .7s infinite alternate}
+@keyframes blink{from{opacity:1}to{opacity:.45}}
+.track{height:8px;background:#292936;border-radius:10px;overflow:hidden}
+#bar{height:100%;width:0;background:#ff315b}
+#reveal{padding-top:12vh}
+#arena{
+  height:390px;max-height:55vh;min-height:300px;
+  position:relative;overflow:hidden;border:1px solid #00f5ff;
+  border-radius:16px;background:
+  radial-gradient(ellipse at center,#171747 0%,#080817 70%);
+  touch-action:none;user-select:none
+}
+#player{
+  position:absolute;bottom:14px;left:50%;
+  transform:translateX(-50%);font-size:36px;
+  filter:drop-shadow(0 0 9px #00f5ff)
+}
+.fall{
+  position:absolute;top:-30px;font-size:25px;
+  pointer-events:none
+}
+.orb{
+  position:absolute;top:-30px;font-size:24px;
+  pointer-events:none
+}
+.stats{display:flex;justify-content:space-around;margin:14px 0}
+.stats b{color:#00f5ff}
+#message{color:#ffe66d;min-height:25px}
+small{color:#9a9ab5;line-height:1.6}
+</style>
+</head>
+<body>
+
+<section id="warning" class="screen">
+  <div class="warningbox">
+    <div style="font-size:58px">☠️</div>
+    <h1 class="red blink">YOUR PHONE IS HACKED!</h1>
+    <p>UNAUTHORIZED ACCESS DETECTED</p>
+    <p>Checking system security...</p>
+    <div class="track"><div id="bar"></div></div>
+    <h2 id="percent" class="red">0%</h2>
+    <p id="status">Connecting to cyber network...</p>
+    <small>This is a fictional prank screen. No scanning is happening.</small>
+  </div>
+  <button onclick="showReveal()">REVEAL THE TRUTH 😂</button>
+</section>
+
+<section id="reveal" class="screen hidden">
+  <div style="font-size:80px">😂</div>
+  <h1 class="neon">JUST KIDDING!</h1>
+  <h2>Your phone is totally safe ❤️</h2>
+  <p>You really thought I hacked you? 💀</p>
+  <p>Okay, hacker... let's see your gaming skills.</p>
+  <button onclick="openGame()">ENTER CYBER ARENA ⚡</button>
+</section>
+
+<section id="game" class="screen hidden">
+  <h1 class="neon">CYBER ARENA 👾</h1>
+  <p>Dodge meteors ☄️ and collect energy orbs 🔵!</p>
+  <div class="stats">
+    <span>Score<br><b id="score">0</b></span>
+    <span>Lives<br><b id="lives">❤️❤️❤️</b></span>
+    <span>Best<br><b id="best">0</b></span>
+  </div>
+  <div id="arena">
+    <div id="player">🚀</div>
+  </div>
+  <p id="message">Tap START and survive for 30 seconds!</p>
+  <button id="start" onclick="startGame()">START GAME 🚀</button>
+  <p><small>Move your rocket by dragging left or right inside the arena.</small></p>
+  <button onclick="backToPrank()" style="background:#25253a;color:white">BACK</button>
+</section>
+
+<script>
+const $=id=>document.getElementById(id);
+let scanTimer=null,gameTimer=null,spawnTimer=null;
+let running=false,score=0,lives=3,time=30;
+let objects=[],playerX=.5,lastSpawn=0;
+let best=0;
+
+try{best=Number(localStorage.getItem("cyberBest"))||0}catch(e){}
+$("best").textContent=best;
+
+function showReveal(){
+  clearInterval(scanTimer);
+  $("warning").classList.add("hidden");
+  $("reveal").classList.remove("hidden");
+}
+const statuses=[
+ "Connecting to cyber network...",
+ "Checking imaginary files...",
+ "Detecting meme activity...",
+ "Analyzing your stalking skills...",
+ "Almost done... just kidding!"
+];
+let progress=0;
+scanTimer=setInterval(()=>{
+  progress=Math.min(100,progress+Math.floor(Math.random()*13)+5);
+  $("bar").style.width=progress+"%";
+  $("percent").textContent=progress+"%";
+  $("status").textContent=statuses[Math.floor(Math.random()*statuses.length)];
+  if(progress>=100){
+    clearInterval(scanTimer);
+    setTimeout(showReveal,500);
+  }
+},400);
+
+function openGame(){
+  $("reveal").classList.add("hidden");
+  $("game").classList.remove("hidden");
+}
+function backToPrank(){
+  stopGame();
+  $("game").classList.add("hidden");
+  $("reveal").classList.remove("hidden");
+}
+function stopGame(){
+  running=false;
+  clearInterval(gameTimer);
+  clearInterval(spawnTimer);
+  objects.forEach(o=>o.el.remove());
+  objects=[];
+}
+function startGame(){
+  stopGame();
+  score=0;lives=3;time=30;playerX=.5;
+  $("score").textContent=score;
+  $("lives").textContent="❤️❤️❤️";
+  $("message").textContent="Dodge the meteors!";
+  $("start").disabled=true;
+  $("start").textContent="GAME ON ⚡";
+  $("player").style.left="50%";
+  running=true;
+  const startTime=Date.now();
+  spawnTimer=setInterval(spawnObject,540);
+  gameTimer=setInterval(()=>{
+    time=30-Math.floor((Date.now()-startTime)/1000);
+    if(time<=0){time=0;endGame("TIME SURVIVED! 🏆");}
+    $("message").textContent="Time left: "+time+" seconds";
+  },200);
+  requestAnimationFrame(loop);
+}
+function spawnObject(){
+  if(!running)return;
+  const arena=$("arena");
+  const isOrb=Math.random()<.30;
+  const el=document.createElement("div");
+  el.className=isOrb?"orb":"fall";
+  el.textContent=isOrb?"🔵":(Math.random()<.5?"☄️":"🔥");
+  const x=8+Math.random()*(arena.clientWidth-36);
+  el.style.left=x+"px";
+  el.style.top="-32px";
+  arena.appendChild(el);
+  objects.push({el,x,y:-32,orb:isOrb,speed:isOrb?2.8:3.3+Math.random()*2});
+}
+let lastFrame=0;
+function loop(now){
+  if(!running)return;
+  const dt=Math.min((now-lastFrame)/16.67||1,2);
+  lastFrame=now;
+  const arena=$("arena"),p=$("player");
+  const pw=arena.clientWidth,ph=arena.clientHeight;
+  const px=playerX*pw,py=ph-31;
+  for(let i=objects.length-1;i>=0;i--){
+    const o=objects[i];
+    o.y+=o.speed*dt;
+    o.el.style.top=o.y+"px";
+    const ox=o.x+12,oy=o.y+12;
+    if(Math.abs(ox-px)<30&&Math.abs(oy-py)<31){
+      o.el.remove();objects.splice(i,1);
+      if(o.orb){
+        score+=5;
+        $("message").textContent="+5 ENERGY! ⚡";
+      }else{
+        lives--;
+        $("message").textContent="Meteor hit! Watch out! 💥";
+        $("lives").textContent="❤️".repeat(lives)+"🖤".repeat(3-lives);
+        if(lives<=0){endGame("GAME OVER 💥");return;}
+      }
+      $("score").textContent=score;
+      continue;
+    }
+    if(o.y>ph+30){o.el.remove();objects.splice(i,1);}
+  }
+  requestAnimationFrame(loop);
+}
+function endGame(title){
+  if(!running)return;
+  stopGame();
+  if(score>best){
+    best=score;
+    try{localStorage.setItem("cyberBest",best)}catch(e){}
+  }
+  $("best").textContent=best;
+  $("message").textContent=title+" Final score: "+score+" ⭐";
+  $("start").disabled=false;
+  $("start").textContent="PLAY AGAIN 🔁";
+}
+const arena=$("arena");
+function movePlayer(e){
+  if(!running)return;
+  const r=arena.getBoundingClientRect();
+  playerX=Math.max(.06,Math.min(.94,(e.clientX-r.left)/r.width));
+  $("player").style.left=(playerX*100)+"%";
+}
+arena.addEventListener("pointerdown",e=>{
+  if(e.target===$("player"))e.preventDefault();
+  movePlayer(e);
+});
+arena.addEventListener("pointermove",e=>{
+  if(e.buttons===1||e.pointerType==="touch")movePlayer(e);
+});
+</script>
+</body>
+</html>
